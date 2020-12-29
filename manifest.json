@@ -1,0 +1,30 @@
+{
+  "name": "sudoku.com Twich connector",
+  "version": "1.0",
+  "description": "Allows taking part in sudoku solving with channel commands, e.g. !s A1,2",
+  "manifest_version": 2,
+  "permissions": ["activeTab", "declarativeContent" ,"storage"],
+  "background": {
+    "scripts": ["background.js", "tmi.min.js"],
+    "persistent": false
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": false
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://sudoku.com/*"],
+      "css": ["sudokuTwitch.css"],
+      "js": [
+        "tmi.min.js",
+        "sudokuTwitch.js"
+      ]
+    }
+  ],
+  "browser_action": {
+    "default_popup": "popup.html",
+    "default_title": "Sudoku TwitchBot",
+    "default_icon": "suudouku.png"
+  }
+}
