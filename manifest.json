@@ -6,7 +6,7 @@
   "permissions": ["activeTab", "declarativeContent" ,"storage"],
   "background": {
     "scripts": ["background.js", "tmi.min.js"],
-    "persistent": false
+    "persistent": true
   },
   "options_ui": {
     "page": "options.html",
