@@ -1,74 +1,88 @@
-var client = null;
+var twitchClient = null;
 var activeTab = null;
+var killTimer = null;
+var sudoku_history = [];
 
 chrome.runtime.onInstalled.addListener(function() {
-    console.log("Sudoku TwitchBot installed")
-    chrome.browserAction.setBadgeText({text: "Alive"});
+    console.log("onInstalled");
+    //chrome.browserAction.setBadgeText({text: "START"});
 });
 
 chrome.runtime.onSuspend.addListener(function() {
-    console.log("Unloading.");
-    chrome.browserAction.setBadgeText({text: "RIP"});
+    console.log("onSuspend");
+    chrome.browserAction.setBadgeText({text: "BYE"});
 });
 
-function twitchbot_onmessage(target, context, msg, ownMessage) {
-    console.log("Target: " + target + " context: " + context + " msg: " + msg + " ownMessage: " + ownMessage)
-    let match = msg.toLowerCase().match(/^!s ([a-i])([1-9])[, ]([1-9])/)
+function messageReceived(target, tags, msg, self) {
+    //if (self) return; // Skip echoes of our own messages
+    console.log("messageReceived: " + msg)
+    let match = msg.match(/^!s ([a-i][1-9])[, ]([1-9])/i)
     if (match && activeTab) {
-        let column = match[1].charCodeAt(0) - 97 // Convert column from A-I to 0 based index
-        let row = parseInt(match[2]) - 1 // Convert from 1 based to 0 based index
-        let value = parseInt(match[3])
+        let cell = match[1].toUpperCase();
+        let value = parseInt(match[2]);
+        sudoku_history.push({username: tags.username, cell: cell, value: value});
         chrome.tabs.sendMessage(activeTab, {
             type: "sudoku",
-            column: column,
-            row: row,
+            cell: cell,
             value: value
-        }, function(response) {
-            console.log("Response: " + response);
         });
     }
-}
-
-function twitchbot_connect() {
-    // Get settings from storage
-    chrome.storage.local.get(["twitch_username", "twitch_token"], function(items) {
-        if (client) {
-            client.disconnect();
-        }
-        // Create Twitch client
-        client = new tmi.client({
-            "identity": {
-                "username": items.twitch_username,
-                "password": items.twitch_token
-            },
-            "channels": [
-                items.twitch_username
-            ]
-        });
-        client.on('message', twitchbot_onmessage);
-        client.connect();
-    });
-}
-
-function twitchbot_disconnect() {
-    client.disconnect();
-    client = null;
 }
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-    if (request.type === "connect") {
-        console.log("Connect!")
-        twitchbot_connect()
-        chrome.browserAction.setBadgeText({text: "CON"});
-    } else if (request.type === "disconnect") {
-        console.log("Disconnect!")
-        twitchbot_disconnect()
-        chrome.browserAction.setBadgeText({text: "DIS"});
-    } else if (request.type === "register") {
-        console.log("Registration received from " + sender);
-        activeTab = sender.tab.id;
-    } else if (request.type === "test") {
-        console.log("TEST");
-        chrome.tabs.sendMessage(activeTab, {type: "test"})
+    if (request.type === "hello") {
+        let tabId = sender.tab.id;
+        console.log("Hello from tab " + tabId);
+        resetKillTimer();
+        activeTab = tabId;
+        if (!twitchClient) {
+            chrome.storage.local.get(["twitch_username", "twitch_token"], function(items) {
+                twitchClient = new tmi.Client({
+                    options: { debug: true },
+                    connection: {
+                        reconnect: true,
+                        secure: true
+                    },
+                    identity: {
+                        username: items.twitch_username,
+                        password: items.twitch_token
+                    },
+                    channels: [
+                        items.twitch_username
+                    ]
+                });
+                twitchClient.on('message', messageReceived);
+                twitchClient.connect().catch(console.error);
+            });
+        }
+        chrome.browserAction.setBadgeText({text: "ON"});
+    } else if (request.type === "get_history") {
+        console.log("get_history");
+        sendResponse({entries: sudoku_history});
+    } else if (request.type === "reset") {
+        console.log("reset");
+        reset();
+        if (killTimer) {
+            clearTimeout(killTimer);
+        }
     }
 });
+
+function reset() {
+    console.log("Reset!")
+    chrome.browserAction.setBadgeText({text: "OFF"});
+    activeTab = null;
+    sudoku_history = [];
+    if (twitchClient) {
+        twitchClient.disconnect().catch(console.error);
+        twitchClient = null;
+    }
+}
+function resetKillTimer() {
+    if (killTimer) {
+        clearTimeout(killTimer);
+    }
+    killTimer = setTimeout(reset, 10000);
+}
+
+resetKillTimer();

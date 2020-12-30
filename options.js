@@ -4,22 +4,19 @@ function save_options() {
         twitch_username: document.getElementById('twitch_username').value,
         twitch_token: document.getElementById('twitch_token').value
     }, function() {
-        // Update status to let user know options were saved.
-        const status = document.getElementById('status');
-        status.textContent = 'Saved.';
-        setTimeout(function() {
-            status.textContent = '';
-        }, 750);
+        document.getElementById('status').textContent = 'Saved.';
     });
 }
 
-function restore_options() {
-    // Use default value color = 'red' and likesColor = true.
-    chrome.storage.local.get(["twitch_username", "twitch_token"], function(items) {
+function load_options() {
+    chrome.storage.local.get({"twitch_username": "", "twitch_token": ""}, function(items) {
         document.getElementById('twitch_username').value = items.twitch_username;
         document.getElementById('twitch_token').value = items.twitch_token;
     });
 }
 
-document.addEventListener('DOMContentLoaded', restore_options);
+// When options page loads, load options from chrome's storage.
+document.addEventListener('DOMContentLoaded', load_options);
+
+// When save is clicked, save options to chrome's storage.
 document.getElementById('save').addEventListener('click', save_options);
