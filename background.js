@@ -16,10 +16,13 @@ chrome.runtime.onSuspend.addListener(function() {
 function messageReceived(target, tags, msg, self) {
     //if (self) return; // Skip echoes of our own messages
     console.log("messageReceived: " + msg)
-    let match = msg.match(/^!s ([a-i][1-9])[, ]([1-9])/i)
+    let match = msg.match(/^!s ([a-i][1-9])[, ]([1-9-])/i)
     if (match && activeTab) {
         let cell = match[1].toUpperCase();
-        let value = parseInt(match[2]);
+        let value = null;
+        if (match[2] !== "-") {
+            value = parseInt(match[2]);
+        }
         sudoku_history.push({username: tags.username, cell: cell, value: value});
         chrome.tabs.sendMessage(activeTab, {
             type: "sudoku",

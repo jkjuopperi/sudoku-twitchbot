@@ -10,10 +10,15 @@ chrome.runtime.onMessage.addListener(
 
             // Find the correct game-cell and click it.
             let cells = document.getElementsByClassName("game-cell");
-            cells[9 * row + column].click()
+            cells[9 * row + column].click();
 
             // Find the correct numpad key and click it.
-            let numpadNums = document.getElementsByClassName("numpad-item")[request.value-1].click()
+            if (request.value) {
+                document.getElementsByClassName("numpad-item")[request.value-1].click();
+            } else {
+                document.getElementsByClassName("game-controls-erase")[0].click();
+            }
+
         }
     }
 );
