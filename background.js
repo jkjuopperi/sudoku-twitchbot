@@ -13,9 +13,16 @@ chrome.runtime.onSuspend.addListener(function() {
     chrome.browserAction.setBadgeText({text: "BYE"});
 });
 
-function messageReceived(target, tags, msg, self) {
+function messageReceived(channel, tags, msg, self) {
     //if (self) return; // Skip echoes of our own messages
     console.log("messageReceived: " + msg)
+
+    if(msg.toLowerCase() === '!commands') {
+        if (twitchClient) {
+            twitchClient.say(channel, 'Commands: !s <cell> <number> - Aseta tai poista numero: !s A1 1, !s A1 -');
+        }
+    }
+
     let match = msg.match(/^!s ([a-i][1-9])[, ]([1-9-])/i)
     if (match && activeTab) {
         let cell = match[1].toUpperCase();
