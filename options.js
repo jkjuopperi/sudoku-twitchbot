@@ -2,16 +2,18 @@
 function save_options() {
     chrome.storage.local.set({
         twitch_username: document.getElementById('twitch_username').value,
-        twitch_token: document.getElementById('twitch_token').value
+        twitch_token: document.getElementById('twitch_token').value,
+        twitch_channel: document.getElementById('twitch_channel').value
     }, function() {
         document.getElementById('status').textContent = 'Saved.';
     });
 }
 
 function load_options() {
-    chrome.storage.local.get({"twitch_username": "", "twitch_token": ""}, function(items) {
+    chrome.storage.local.get({"twitch_username": "", "twitch_token": "", "twitch_channel": ""}, function(items) {
         document.getElementById('twitch_username').value = items.twitch_username;
         document.getElementById('twitch_token').value = items.twitch_token;
+        document.getElementById('twitch_channel').value = items.twitch_channel;
     });
 }
 

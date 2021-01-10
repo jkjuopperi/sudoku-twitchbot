@@ -39,7 +39,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         resetKillTimer();
         activeTab = tabId;
         if (!twitchClient) {
-            chrome.storage.local.get(["twitch_username", "twitch_token"], function(items) {
+            chrome.storage.local.get(["twitch_username", "twitch_token", "twitch_channel"], function(items) {
                 twitchClient = new tmi.Client({
                     options: { debug: true },
                     connection: {
@@ -51,7 +51,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                         password: items.twitch_token
                     },
                     channels: [
-                        items.twitch_username
+                        items.twitch_channel
                     ]
                 });
                 twitchClient.on('message', messageReceived);
