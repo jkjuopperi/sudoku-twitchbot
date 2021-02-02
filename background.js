@@ -23,7 +23,7 @@ function messageReceived(channel, tags, msg, self) {
         }
     }
 
-    let match = msg.match(/^!s ([a-i][1-9])[, ]([1-9-])/i)
+    let match = msg.match(/^!s ([a-i][1-9])[, ]([1-9-])$/i)
     if (match && activeTab) {
         let cell = match[1].toUpperCase();
         let value = null;
