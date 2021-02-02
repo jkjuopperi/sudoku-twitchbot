@@ -1,3 +1,12 @@
 .chat-user-cell {
     background-color: #ff800020 !important;
 }
+
+.stream-number {
+    position: absolute;
+}
+
+.game-wrapper {
+    margin-left: 15px;
+    margin-top: 15px;
+}

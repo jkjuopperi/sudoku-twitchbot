@@ -33,3 +33,26 @@ chrome.extension.sendMessage({ type: 'hello' });
 var twitchbot_hello_timer = setInterval(function () {
     chrome.extension.sendMessage({ type: 'hello' });
 }, 5000);
+
+function inject_numbers () {
+    let game_wrapper = document.getElementsByClassName('game-wrapper')[0];
+    let x_arr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
+    x_arr.forEach(function (value, i) {
+        let elem = document.createElement('div');
+        elem.classList.add('stream-number');
+        elem.textContent = value;
+        elem.style.top = '-5%';
+        elem.style.left = '' + ((100/9)*i + (100/18)) + '%';
+        game_wrapper.appendChild(elem);
+    });
+    let y_arr = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    y_arr.forEach(function (value, i) {
+        let elem = document.createElement('div');
+        elem.classList.add('stream-number');
+        elem.textContent = value;
+        elem.style.left = '-4%';
+        elem.style.top = '' + ((100/9)*i + 3 ) + '%';
+        game_wrapper.appendChild(elem);
+    });
+}
+setTimeout(inject_numbers, 1000);
