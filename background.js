@@ -23,19 +23,48 @@ function messageReceived(channel, tags, msg, self) {
         }
     }
 
-    let match = msg.match(/^!s ([a-i][1-9])[, ]([1-9-])$/i)
-    if (match && activeTab) {
-        let cell = match[1].toUpperCase();
-        let value = null;
-        if (match[2] !== "-") {
-            value = parseInt(match[2]);
+    if (msg.match(/^![^t] /)) {
+        let match = msg.match(/^!s ([a-i][1-9])[, ]([1-9-])$/i)
+        let match_reverse = msg.match(/^!s ([1-9][a-i])[, ]([1-9-])$/i)
+        if (match) {
+            if (activeTab) {
+                let cell = match[1].toUpperCase();
+                let value = null;
+                if (match[2] !== "-") {
+                    value = parseInt(match[2]);
+                }
+                sudoku_history.push({username: tags.username, cell: cell, value: value});
+                chrome.tabs.sendMessage(activeTab, {
+                    type: "sudoku",
+                    cell: cell,
+                    value: value
+                });
+            }
+        } else if (match_reverse) {
+            if (activeTab) {
+                let cell = '' + match_reverse[1].toUpperCase()[1] + match_reverse[1].toUpperCase()[0];
+                let value = null;
+                if (match_reverse[2] !== "-") {
+                    value = parseInt(match_reverse[2]);
+                }
+                sudoku_history.push({username: tags.username, cell: cell, value: value});
+                chrome.tabs.sendMessage(activeTab, {
+                    type: "sudoku",
+                    cell: cell,
+                    value: value
+                });
+            }
+        } else {
+            if (Math.random() < 0.01) {
+                let errors = ["/me hugs you <3", "/me loves you <3"];
+                let error = errors[Math.floor(Math.random() * errors.length)];
+                twitchClient.say(channel, error);
+            } else {
+                let errors = ["Whoopsie!", "typo :D", "?", "nani :3", "oho!", "hupsis :D", "try again", "yritäpä uudestaan", "kas noin!"];
+                let error = errors[Math.floor(Math.random() * errors.length)];
+                twitchClient.say(channel, error);
+            }
         }
-        sudoku_history.push({username: tags.username, cell: cell, value: value});
-        chrome.tabs.sendMessage(activeTab, {
-            type: "sudoku",
-            cell: cell,
-            value: value
-        });
     }
 }
 
