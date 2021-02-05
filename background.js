@@ -2,6 +2,7 @@ var twitchClient = null;
 var activeTab = null;
 var killTimer = null;
 var sudoku_history = [];
+var last_message = null;
 
 chrome.runtime.onInstalled.addListener(function() {
     console.log("onInstalled");
@@ -16,6 +17,13 @@ chrome.runtime.onSuspend.addListener(function() {
 function messageReceived(channel, tags, msg, self) {
     //if (self) return; // Skip echoes of our own messages
     console.log("messageReceived: " + msg)
+
+    if (msg === last_message) {
+        console.log("duplicate message")
+        return;
+    } else {
+        last_message = msg;
+    }
 
     if(msg.toLowerCase() === '!commands') {
         if (twitchClient) {
