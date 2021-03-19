@@ -11,6 +11,25 @@ function activityDetected(event) {
 document.body.addEventListener('click', activityDetected);
 document.body.addEventListener('keydown', activityDetected);
 
+function areNotesOn() {
+    return document.getElementById('sudoku-wrapper').classList.contains('pencil-mode');
+}
+
+function setNotes(enable) {
+    let enabledAlready = areNotesOn();
+    if (enable) {
+        if (!enabledAlready) {
+            console.log("Enabling notes");
+            document.getElementsByClassName('game-controls-pencil')[0].click();
+        }
+    } else {
+        if (enabledAlready) {
+            console.log("Disabling notes");
+            document.getElementsByClassName('game-controls-pencil')[0].click();
+        }
+    }
+}
+
 /**
  * Handle one game move
  */
@@ -28,6 +47,12 @@ function handleRequest(request) {
         let gameCell = cells[9 * row + column];
         gameCell.click();
 
+        // Save notes state
+        let notesOrignallyEnabled = areNotesOn();
+
+        // Are we setting notes?
+        setNotes(request.note);
+
         // Find the correct numpad key and click it.
         if (request.value) {
             document.getElementsByClassName("numpad-item")[request.value-1].click();
@@ -36,6 +61,9 @@ function handleRequest(request) {
             document.getElementsByClassName("game-controls-erase")[0].click();
             gameCell.classList.remove("chat-user-cell")
         }
+
+        // Restore notes state
+        setNotes(notesOrignallyEnabled);
     }
 }
 

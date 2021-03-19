@@ -32,8 +32,8 @@ function messageReceived(channel, tags, msg, self) {
     }
 
     if (msg.match(/^![^t] /)) {
-        let match = msg.match(/^!s ([a-i][1-9])[, ]([1-9-])$/i)
-        let match_reverse = msg.match(/^!s ([1-9][a-i])[, ]([1-9-])$/i)
+        let match = msg.match(/^!s ([a-i][1-9])[, ]([1-9-])(n?)$/i)
+        let match_reverse = msg.match(/^!s ([1-9][a-i])[, ]([1-9-])(n?)$/i)
         if (match) {
             if (activeTab) {
                 let cell = match[1].toUpperCase();
@@ -41,11 +41,13 @@ function messageReceived(channel, tags, msg, self) {
                 if (match[2] !== "-") {
                     value = parseInt(match[2]);
                 }
-                sudoku_history.push({username: tags.username, cell: cell, value: value});
+                let isNote = match[3] === "n"
+                sudoku_history.push({username: tags.username, cell: cell, value: value, note: isNote});
                 chrome.tabs.sendMessage(activeTab, {
                     type: "sudoku",
                     cell: cell,
-                    value: value
+                    value: value,
+                    note: isNote
                 });
             }
         } else if (match_reverse) {
@@ -55,11 +57,13 @@ function messageReceived(channel, tags, msg, self) {
                 if (match_reverse[2] !== "-") {
                     value = parseInt(match_reverse[2]);
                 }
-                sudoku_history.push({username: tags.username, cell: cell, value: value});
+                let isNote = match[3] === "n"
+                sudoku_history.push({username: tags.username, cell: cell, value: value, note: isNote});
                 chrome.tabs.sendMessage(activeTab, {
                     type: "sudoku",
                     cell: cell,
-                    value: value
+                    value: value,
+                    note: isNote
                 });
             }
         } else {
