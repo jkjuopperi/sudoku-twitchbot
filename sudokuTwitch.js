@@ -76,7 +76,7 @@ function processQueue() {
         console.log("Nothing to do");
         return;
     }
-    let requiredIdle = 4000;
+    let requiredIdle = 2000;
     let now = performance.now();
     let idle = now - lastActivity;
     console.log("Processing queue at " + now + " with last activity at " + lastActivity + " idle " + idle);
